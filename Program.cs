@@ -1,7 +1,21 @@
+using CyberGuardian360.DBContext;
+using CyberGuardian360.Models.EFDBContext;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+// Add ApplicationDbContext to the services
+builder.Services.AddDbContext<CyberGuardian360DbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("CG360_DB")));
+
+// Add Identity services
+builder.Services.AddIdentity<UserRegistration, IdentityRole>()
+    .AddEntityFrameworkStores<CyberGuardian360DbContext>()
+    .AddDefaultTokenProviders();
 
 var app = builder.Build();
 
