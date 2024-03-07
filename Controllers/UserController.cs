@@ -84,14 +84,58 @@ namespace CyberGuardian360.Controllers
                 var result = await signInManager.PasswordSignInAsync(model.Email, model.Password, isPersistent: false, lockoutOnFailure: false);
 
                 if (result.Succeeded)
-                {
+                { 
+                    TempData["IsLogged"] = true;
+
+                    var user = dbContext.Users.Where(e => e.Email == model.Email).FirstOrDefault();
+
+                    if (user != null)
+                    {     
+                        if (user.IsAdmin)
+                        {
+                            TempData["IsAdmin"] = true;
+                        }
+                        else
+                        {
+                            TempData["IsAdmin"] = false;
+                        }
+                    }
+
                     return RedirectToAction("Index", "CSProducts");
                 }
 
-                ModelState.AddModelError(string.Empty, "Email or Password is incorrect.");
+                TempData["LoginError"] = "Incorrect username/password. Register here if you are new.";
+
             }
 
             return View(model);
         }
+
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public async Task<IActionResult> SignOut()
+        //{
+        //    // Get the current user
+        //    var user = await this.userManager.GetUserAsync(User);
+
+        //    // Sign out the user
+        //    await this.signInManager.SignOutAsync();
+
+        //    if (user != null)
+        //    {
+        //        // Delete the cart items associated with the user
+        //        var cartItems = await this.dbContext.tblUserCartEntities
+        //            .Where(u => u.userId == user.Id)
+        //            .ToListAsync();
+
+        //        if (cartItems.Any())
+        //        {
+        //            this.dbContext.tblUserCartEntities.RemoveRange(cartItems);
+        //            await this.dbContext.SaveChangesAsync();
+        //        }
+        //    }
+
+        //    return RedirectToAction("Index", "Home");
+        //}
     }
 }

@@ -21,18 +21,36 @@
                 </div>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-end paddingright20px">
                     <ul class="navbar-nav mr-auto">
-                        @if (SignInManager.IsSignedIn(User))
+                        @if (TempData["IsLogged"] != null)
                         {
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="Admin" asp-action="Index">
-                                    <span aria-hidden="true"></span>Admin
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="User" asp-action="SignOut">
-                                    <span class="glyphicon glyphicon-log-out" aria-hidden="true"></span>Sign Out
-                                </a>
-                            </li>
+                            @if ((bool)TempData["IsLogged"] == true)
+                            {
+                                if (TempData["IsAdmin"] != null)
+                                {
+                                    if ((bool)TempData["IsAdmin"] == true)
+                                    {
+                                        <li class="nav-item">
+                                            <a class="nav-link text-dark" asp-controller="Admin" asp-action="Index">
+                                                <span aria-hidden="true"></span>Admin
+                                            </a>
+                                        </li>
+                                    }
+                                }
+
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-controller="User" asp-action="SignOut">
+                                        <span class="glyphicon glyphicon-log-out" aria-hidden="true"></span>Sign Out
+                                    </a>
+                                </li>
+                            }
+                            else
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-controller="User" asp-action="SignIn">
+                                        <span class="glyphicon glyphicon-log-in" aria-hidden="true"></span>Sign In
+                                    </a>
+                                </li>
+                            }
                         }
                         else
                         {
@@ -42,6 +60,8 @@
                                 </a>
                             </li>
                         }
+                      
+                        
                     </ul>
                 </div>
             </div>

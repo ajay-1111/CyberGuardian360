@@ -47,3 +47,19 @@
         </div>
     </section>
 </form>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        var customeMessage = '@(TempData["LoginError"] as string)';
+
+        if (customeMessage) {
+            Swal.fire()
+                'Cyber Guardian 360',
+                customeMessage,
+                'error').then(function () {
+                    var url = '@Url.Action("SignIn", "User")';
+                    window.location.href = url;
+                });
+        }
+    });
+</script>
