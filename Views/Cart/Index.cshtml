@@ -1,0 +1,158 @@
+﻿@model List<CyberGuardian360.Models.UserCartViewModel>
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<CyberGuardian360.Models.EFDBContext.UserRegistration> SignInManager
+@if (SignInManager.IsSignedIn(User))
+{
+    <h2 class="text-center mb-4" style="padding-top: 2em">Order Summary</h2>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th scope="col">Product Name</th>
+                                <th scope="col">Product Cost</th>
+                                <th scope="col">Quantity</th>
+                                <th scope="col"> </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model != null && Model.Count > 0)
+                            {
+                                @foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td>@item.ProductName</td>
+                                        <td>£@item.ProductCost</td>
+                                        <td>
+                                            <div class="input-group">
+                                                <button class="btn btn-outline-secondary minusBtn" data-product-id="@item.ProductId">-</button>
+                                                <input type="text" class="form-control quantity-input" value="@item.Quantity" id="quantity-@item.ProductId" readonly />
+                                                <button class="btn btn-outline-secondary plusBtn" data-product-id="@item.ProductId">+</button>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-danger removeBtn" data-product-id="@item.ProductId">Remove</button>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <div></div>
+                            }
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="row justify-content-end">
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Total</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">£<span id="totalPrice">@Model.Sum(item => Math.Round(item.ProductCost,2) * item.Quantity)</span></h6>
+                        <button class="btn btn-outline-light btn-block checkOutBtn cust_btn">Proceed to Checkout</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @section Scripts {
+    <script>
+        $(document).ready(function () {
+            $(document).on('click', '.plusBtn', function () {
+                var productId = $(this).data('product-id');
+                var quantityInput = $('#quantity-' + productId);
+                var quantity = parseInt(quantityInput.val());
+                quantityInput.val(quantity + 1);
+                updateTotalPrice();
+            });
+
+            $(document).on('click', '.minusBtn', function () {
+                var productId = $(this).data('product-id');
+                var quantityInput = $('#quantity-' + productId);
+                var quantity = parseInt(quantityInput.val());
+                if (quantity > 1) {
+                    quantityInput.val(quantity - 1);
+                    updateTotalPrice();
+                }
+            });
+
+            $(document).on('click', '.removeBtn', function () {
+                var productId = $(this).data('product-id');
+                var row = $(this).closest('tr');
+                $.ajax({
+                    url: '/Cart/Clear',
+                    method: 'POST',
+                    data: { productId: productId },
+                    success: function (response) {
+                        if (response.success) {
+                            row.remove();
+                            updateTotalPrice();
+                        } else {
+                            console.error('Unable to remove item.');
+                        }
+                    },
+                    error: function (err) {
+                        console.error('Error:', err);
+                    }
+                });
+            });
+
+            $(document).on('click', '.checkOutBtn', function () {
+                debugger;
+                $.ajax({
+                    url: '/Purchases/Buy',
+                    method: 'POST',
+                    success: function (response) {
+                        var url = '@Url.Action("Index", "CSProducts")';
+                        window.location.href = url;
+                        //if (response.success) {
+                            \                            //Swal.fire(
+                            //    'Clothing Store',
+                            //    response.message,
+                            //    'success').then(function () {
+                            //        var url = '@Url.Action("Index", "Products")';
+                            //        window.location.href = url;
+                            //    });
+                        //} else {
+                            //Swal.fire(
+                            //    'Clothing Store',
+                            //    response.message,
+                            //    'error').then(function () {
+                            //        var url = '@Url.Action("Index", "Products")';
+                            //        window.location.href = url;
+                            //    });
+                        //}
+                    },
+                    error: function (err) {
+                        console.error('Error:', err);
+                    }
+                });
+            });
+
+            function updateTotalPrice() {
+                var totalPrice = 0;
+                $('.quantity-input').each(function () {
+                    var priceText = $(this).closest('tr').find('td:eq(1)').text().trim().replace('£', '');
+                    var price = parseFloat(priceText);
+                    var quantity = parseInt($(this).val());
+                    if (!isNaN(price) && !isNaN(quantity)) {
+                        totalPrice += price * quantity;
+                    }
+                });
+                $('#totalPrice').text(totalPrice.toFixed(2));
+            }
+        });
+    </script>
+}
+}
+else
+{
+    <div class="row g-3 col-form-label-lg paddingtop3rem">You are logged out. Please sign In.</div>
+}

@@ -4,6 +4,7 @@ using CyberGuardian360.DBContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CyberGuardian360.Migrations
 {
     [DbContext(typeof(CyberGuardian360DbContext))]
-    partial class CyberGuardian360DbContextModelSnapshot : ModelSnapshot
+    [Migration("20240309110752_CG360_Removed_Password")]
+    partial class CG360_Removed_Password
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

@@ -20,9 +20,6 @@ namespace CyberGuardian360.Models.EFDBContext
         [StringLength(100)]
         public string Phone { get; set; }
 
-        [StringLength(50)]
-        public string Password { get; set; }
-
         public bool IsAdmin { get; set; } = false;
     }
 }

@@ -55,34 +55,6 @@ namespace CyberGuardian360.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Details(int productid)
-        {
-            TempData["NoProductFound"] = null;
-
-            // Retrieve the product with the specified id from the database
-            var product = await _context.CSProducts.FirstOrDefaultAsync(p => p.Id == productid);
-
-            // Check if product is null
-            if (product == null)
-            {
-                TempData["NoProductFound"] = $"Unable to find the product details for ID : {productid}";
-                return View(TempData["NoProductFound"]);
-            }
-
-            CSProductsViewModel productmodel = new CSProductsViewModel()
-            {
-                ImageUrl = product!.ImageUrl,
-                ProductName = product.ProductName,
-                ProductCost = product.ProductCost,
-                ProductRating = product.ProductRating,
-                Id = product.Id,
-            };
-
-            // Pass the product to the view for rendering
-            return View(productmodel);
-        }
-
-        [HttpGet]
         public async Task<IActionResult> GetProductsByCategory(string category)
         {
             if (!string.IsNullOrWhiteSpace(category))

@@ -1,6 +1,10 @@
 ﻿@using Microsoft.AspNetCore.Identity
 @using CyberGuardian360.Models.EFDBContext
 @inject SignInManager<UserRegistration> SignInManager
+@inject IHttpContextAccessor HttpContextAccessor
+@{
+    var isAdmin = HttpContextAccessor.HttpContext.Session.GetString("IsAdmin");
+}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -11,6 +15,7 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/CyberGuardian360.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
 <body>
     <header>
@@ -21,36 +26,31 @@
                 </div>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-end paddingright20px">
                     <ul class="navbar-nav mr-auto">
-                        @if (TempData["IsLogged"] != null)
+                        @if (SignInManager.IsSignedIn(User))
                         {
-                            @if ((bool)TempData["IsLogged"] == true)
+                            <li class="nav-item">
+                                <a class="nav-link bi bi-house-door" title="Home" asp-area="" asp-controller="CSProducts" asp-action="Index"></a>
+                            </li>
+                            if (isAdmin != null)
                             {
-                                if (TempData["IsAdmin"] != null)
+                                if (isAdmin == "1")
                                 {
-                                    if ((bool)TempData["IsAdmin"] == true)
-                                    {
-                                        <li class="nav-item">
-                                            <a class="nav-link text-dark" asp-controller="Admin" asp-action="Index">
-                                                <span aria-hidden="true"></span>Admin
-                                            </a>
-                                        </li>
-                                    }
+                                    <li class="nav-item">
+                                        <a class="nav-link bi bi-person-lock" title="Admin" asp-controller="Admin" asp-action="Index"></a>
+                                    </li>
                                 }
-
-                                <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-controller="User" asp-action="SignOut">
-                                        <span class="glyphicon glyphicon-log-out" aria-hidden="true"></span>Sign Out
-                                    </a>
-                                </li>
                             }
-                            else
-                            {
-                                <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-controller="User" asp-action="SignIn">
-                                        <span class="glyphicon glyphicon-log-in" aria-hidden="true"></span>Sign In
-                                    </a>
-                                </li>
-                            }
+                            <li class="nav-item">
+                                <a class="nav-link bi bi-basket" title="Basket" asp-area="" asp-controller="Cart" asp-action="Index">@TempData["CartItemCount"]</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link bi bi-person-gear" title="Edit Profile" asp-area="" asp-controller="Profile" asp-action="EditProfile"></a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="User" asp-action="SignOut">
+                                    <span class="glyphicon glyphicon-log-out" aria-hidden="true"></span>Sign Out
+                                </a>
+                            </li>
                         }
                         else
                         {
@@ -60,8 +60,6 @@
                                 </a>
                             </li>
                         }
-                      
-                        
                     </ul>
                 </div>
             </div>
@@ -81,6 +79,7 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/disableBackButton.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

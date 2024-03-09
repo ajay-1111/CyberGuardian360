@@ -1,38 +1,46 @@
 ﻿@model List<CyberGuardian360.Models.CSProductsViewModel>
-
-<div class="container">
-    <div class="row mt-5 mb-3">
-        @if (Model != null && Model.Count > 0)
-        {
-            @foreach (var product in Model)
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<CyberGuardian360.Models.EFDBContext.UserRegistration> SignInManager
+@if (SignInManager.IsSignedIn(User))
+{
+    <div class="container">
+        <div class="row mt-5 mb-3">
+            @if (Model != null && Model.Count > 0)
             {
-                <div class="col-sm-12 mb-4">
-                    <div class="card">
-                        <table border="0">
-                            <tr>
-                                <td style="width:15%">
-                                    <img src="product_images/@product.ImageUrl" class="card-img-top" alt="Product Image" style="height:150px;width:150px">
-                                </td>
-                                <td style="width:65%">
-                                    <div class="card-body">
-                                        <h5 class="card-title">@product.ProductName</h5>
-                                        <p class="card-text">Price: $@product.ProductCost</p>
-                                        <p class="card-text">Rating: @product.ProductRating</p>
-                                        <p class="card-text">Description: @product.ProductDescription</p>
-                                    </div>
-                                </td>
-                                <td style="width:25%; text-align:right; padding-right:1rem;">
-                                    <a href="@Url.Action("Details", "Products", new { productId = product.Id })" class="btn btn-primary" style="background-color: #2d545e !important; color: white">Add to Cart</a>
-                                </td>
-                            </tr>
-                        </table>
+                @foreach (var product in Model)
+                {
+                    <div class="col-sm-12 mb-4">
+                        <div class="card">
+                            <table border="0">
+                                <tr>
+                                    <td style="width:15%">
+                                        <img src="product_images/@product.ImageUrl" class="card-img-top" alt="Product Image" style="height:150px;width:150px">
+                                    </td>
+                                    <td style="width:65%">
+                                        <div class="card-body">
+                                            <h5 class="card-title">@product.ProductName</h5>
+                                            <p class="card-text">Price: £@product.ProductCost</p>
+                                            <p class="card-text">Rating: @product.ProductRating</p>
+                                            <p class="card-text">Description: @product.ProductDescription</p>
+                                        </div>
+                                    </td>
+                                    <td style="width:25%; text-align:right; padding-right:1rem;">
+                                        <a asp-controller="Cart" asp-action="AddToCart" asp-route-id="@product.Id" class="btn btn-primary cust_btn">Add to Cart</a>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
                     </div>
-                </div>
+                }
             }
-        }
-        else
-        {
-            <div></div>
-        }
+            else
+            {
+                <div></div>
+            }
+        </div>
     </div>
-</div>
+}
+else
+{
+    <div class="row g-3 col-form-label-lg paddingtop3rem">You are logged out. Please sign In.</div>
+}
