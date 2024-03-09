@@ -54,7 +54,7 @@
                 <div class="card">
                     <div class="card-body">
                         <h5 class="card-title">Total</h5>
-                        <h6 class="card-subtitle mb-2 text-muted">£<span id="totalPrice">@Model.Sum(item => item.ProductCost * item.Quantity)</span></h6>
+                        <h6 class="card-subtitle mb-2 text-muted">£<span id="totalPrice">@Math.Round(Model.Sum(item => item.ProductCost * item.Quantity),2)</span></h6>
                         <button class="btn btn-outline-light btn-block checkOutBtn cust_btn">Proceed to Checkout</button>
                     </div>
                 </div>

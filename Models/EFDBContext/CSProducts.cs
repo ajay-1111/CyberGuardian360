@@ -8,13 +8,13 @@ namespace CyberGuardian360.Models.EFDBContext
         public enum CSCategories
         {
             [Description("Antivirus Software")]
-            Antivirus_Software = 1,
+            AntivirusSoftware = 1,
 
             [Description("Firewall Solutions")]
-            Firewall_Solutions = 2,
+            FirewallSolutions = 2,
 
             [Description("Data Encryption Tools")]
-            Data_Encryption_Tools = 3,
+            DataEncryptionTools = 3,
         }
         public int Id { get; set; }
 
