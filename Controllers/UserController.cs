@@ -114,20 +114,25 @@ namespace CyberGuardian360.Controllers
         {
             var user = await this.userManager.GetUserAsync(User);
 
+            HttpContext.Session.Clear();
+
             await this.signInManager.SignOutAsync();
 
-            if (user != null)
-            {
-                var cartItems = await this.dbContext.CSUserCartInfo
-                    .Where(u => u.UserId == user.Id)
-                    .ToListAsync();
+            
 
-                if (cartItems.Any())
-                {
-                    this.dbContext.CSUserCartInfo.RemoveRange(cartItems);
-                    await this.dbContext.SaveChangesAsync();
-                }
-            }
+            //if (user != null)
+            //{
+            //    var cartItems = await this.dbContext.CSUserCartInfo
+            //        .Where(u => u.UserId == user.Id)
+            //        .ToListAsync();
+
+            //    if (cartItems.Any())
+            //    {
+            //        this.dbContext.CSUserCartInfo.RemoveRange(cartItems);
+            //        await this.dbContext.SaveChangesAsync();
+            //    }
+            //}
+
             return RedirectToAction("Index", "Home");
         }
     }

@@ -4,6 +4,7 @@
 @inject IHttpContextAccessor HttpContextAccessor
 @{
     var isAdmin = HttpContextAccessor.HttpContext.Session.GetString("IsAdmin");
+    var cartCount = HttpContextAccessor.HttpContext.Session.GetString("CartItemCount");
 }
 
 <!DOCTYPE html>
@@ -41,10 +42,10 @@
                                 }
                             }
                             <li class="nav-item">
-                                <a class="nav-link bi bi-basket" title="Basket" asp-area="" asp-controller="Cart" asp-action="Index">@TempData["CartItemCount"]</a>
+                                <a class="nav-link bi bi-person-gear" title="Edit Profile" asp-area="" asp-controller="Profile" asp-action="EditProfile"></a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link bi bi-person-gear" title="Edit Profile" asp-area="" asp-controller="Profile" asp-action="EditProfile"></a>
+                                <a class="nav-link bi bi-basket" title="Basket" asp-area="" asp-controller="Cart" asp-action="Index">@cartCount</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-controller="User" asp-action="SignOut">

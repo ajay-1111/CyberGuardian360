@@ -1,6 +1,7 @@
 ﻿using CyberGuardian360.DBContext;
 using CyberGuardian360.Models;
 using CyberGuardian360.Models.EFDBContext;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -38,7 +39,7 @@ namespace CyberGuardian360.Controllers
         [HttpGet]
         public async Task<IActionResult> AddToCart(int id)
         {
-            TempData["CartItemCount"] = null;
+            //TempData["CartItemCount"] = null;
 
             var product = await _context.CSProducts.FirstOrDefaultAsync(p => p.Id == id);
 
@@ -89,10 +90,133 @@ namespace CyberGuardian360.Controllers
 
             // Set the cart item count in TempData
             int cartItemCount = await GetCartItemCount();
-            TempData["CartItemCount"] = cartItemCount;
+            //TempData["CartItemCount"] = cartItemCount;
+            HttpContext.Session.SetString("CartItemCount", cartItemCount.ToString());
+
 
             return RedirectToAction("Index", "CSProducts");
         }
+
+        [HttpPost]
+        public async Task<IActionResult> IncrementCart(int id)
+        {
+            //TempData["CartItemCount"] = null;
+
+            var product = await _context.CSProducts.FirstOrDefaultAsync(p => p.Id == id);
+
+            var checkIfUserSignedInOrNot = _signInManager.IsSignedIn(User);
+
+            if (checkIfUserSignedInOrNot)
+            {
+                var user = _userManager.GetUserId(User);
+
+                if (user != null)
+                {
+                    var getTheQuantity = await _context.CSUserCartInfo.FirstOrDefaultAsync(p => p.ProductId == id);
+                    if (getTheQuantity != null)
+                    {
+                        getTheQuantity.Quantity += 1;
+                        _context.Update(getTheQuantity);
+                    }
+                    else
+                    {
+                        if (product != null)
+                        {
+                            UserCartInfo newUserCartInfo = new UserCartInfo()
+                            {
+                                ProductId = product.Id,
+                                UserId = user,
+                                Quantity = 1,
+                                ProductCost = product.ProductCost
+                            };
+                            await _context.CSUserCartInfo.AddAsync(newUserCartInfo);
+                        }
+                    }
+                }
+                else
+                {
+                    UserCartInfo newUserCartInfo = new UserCartInfo()
+                    {
+                        ProductId = product!.Id,
+                        UserId = user!,
+                        Quantity = 1,
+                        ProductCost = product.ProductCost
+                    };
+
+                    await _context.CSUserCartInfo.AddAsync(newUserCartInfo);
+                }
+                await _context.SaveChangesAsync();
+            }
+
+
+            // Set the cart item count in TempData
+            int cartItemCount = await GetCartItemCount();
+            //TempData["CartItemCount"] = cartItemCount;
+            HttpContext.Session.SetString("CartItemCount", cartItemCount.ToString());
+
+            return RedirectToAction("Index", "Cart");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DecrementCart(int id)
+        {
+            //TempData["CartItemCount"] = null;
+
+            var product = await _context.CSProducts.FirstOrDefaultAsync(p => p.Id == id);
+
+            var checkIfUserSignedInOrNot = _signInManager.IsSignedIn(User);
+
+            if (checkIfUserSignedInOrNot)
+            {
+                var user = _userManager.GetUserId(User);
+
+                if (user != null)
+                {
+                    var getTheQuantity = await _context.CSUserCartInfo.FirstOrDefaultAsync(p => p.ProductId == id);
+                    if (getTheQuantity != null)
+                    {
+                        getTheQuantity.Quantity -= 1;
+                        _context.Update(getTheQuantity);
+                    }
+                    else
+                    {
+                        if (product != null)
+                        {
+                            UserCartInfo newUserCartInfo = new UserCartInfo()
+                            {
+                                ProductId = product.Id,
+                                UserId = user,
+                                Quantity = 1,
+                                ProductCost = product.ProductCost
+                            };
+                            await _context.CSUserCartInfo.AddAsync(newUserCartInfo);
+                        }
+                    }
+                }
+                else
+                {
+                    UserCartInfo newUserCartInfo = new UserCartInfo()
+                    {
+                        ProductId = product!.Id,
+                        UserId = user!,
+                        Quantity = 1,
+                        ProductCost = product.ProductCost
+                    };
+
+                    await _context.CSUserCartInfo.AddAsync(newUserCartInfo);
+                }
+                await _context.SaveChangesAsync();
+            }
+
+
+            // Set the cart item count in TempData
+            int cartItemCount = await GetCartItemCount();
+            //TempData["CartItemCount"] = cartItemCount;
+            HttpContext.Session.SetString("CartItemCount", cartItemCount.ToString());
+
+            return RedirectToAction("Index", "Cart");
+        }
+
         private async Task<int> GetCartItemCount()
         {
             if (_signInManager.IsSignedIn(User))
