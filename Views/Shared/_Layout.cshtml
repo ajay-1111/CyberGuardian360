@@ -1,6 +1,11 @@
 ﻿@using Microsoft.AspNetCore.Identity
 @using CyberGuardian360.Models.EFDBContext
 @inject SignInManager<UserRegistration> SignInManager
+@inject IHttpContextAccessor HttpContextAccessor
+@{
+    var isAdmin = HttpContextAccessor.HttpContext.Session.GetString("IsAdmin");
+    var cartCount = HttpContextAccessor.HttpContext.Session.GetString("CartItemCount");
+}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -11,6 +16,7 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/CyberGuardian360.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
 <body>
     <header>
@@ -24,9 +30,22 @@
                         @if (SignInManager.IsSignedIn(User))
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="Admin" asp-action="Index">
-                                    <span aria-hidden="true"></span>Admin
-                                </a>
+                                <a class="nav-link bi bi-house-door" title="Home" asp-area="" asp-controller="CSProducts" asp-action="Index"></a>
+                            </li>
+                            if (isAdmin != null)
+                            {
+                                if (isAdmin == "1")
+                                {
+                                    <li class="nav-item">
+                                        <a class="nav-link bi bi-person-lock" title="Admin" asp-controller="Admin" asp-action="Index"></a>
+                                    </li>
+                                }
+                            }
+                            <li class="nav-item">
+                                <a class="nav-link bi bi-person-gear" title="Edit Profile" asp-area="" asp-controller="Profile" asp-action="EditProfile"></a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link bi bi-basket" title="Basket" asp-area="" asp-controller="Cart" asp-action="Index">@cartCount</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-controller="User" asp-action="SignOut">
@@ -47,10 +66,38 @@
             </div>
         </nav>
     </header>
-    <div class="container">
-        <main role="main" class="pb-3">
+    <div class="container w-100">
+        <main role="main" class="pb-3 w-100">
             @RenderBody()
         </main>
+        @if (TempData["toastMsg"] != null)
+        {
+            <div class="toast-container" style="position: absolute; top: 55px; right: 10px;">
+                <div class="toast bg-success text-white fade show">
+                    <div class="toast-header bg-success text-white">
+                        <strong class="me-auto">Status</strong>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+                    </div>
+                    <div class="toast-body">
+                        @TempData["toastMsg"]
+                    </div>
+                </div>
+            </div>
+        }
+        @if (TempData["toastErrMsg"] != null)
+        {
+            <div class="toast-container" style="position: absolute; top: 55px; right: 10px;">
+                <div class="toast bg-danger text-white fade show">
+                    <div class="toast-header bg-danger text-white">
+                        <strong class="me-auto">Status</strong>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+                    </div>
+                    <div class="toast-body">
+                        @TempData["toastErrMsg"]
+                    </div>
+                </div>
+            </div>
+        }
     </div>
 
     <footer class="border-top footer bluewhitecolor">
@@ -58,9 +105,14 @@
             &copy; 2024 - CyberGuardian360
         </div>
     </footer>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/disableBackButton.js" asp-append-version="true"></script>
+    <script>
+        $('.toast').show();
+    </script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

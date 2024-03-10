@@ -50,54 +50,43 @@ namespace CyberGuardian360.Controllers
             {
                 try
                 {
-                    // Check if a file is uploaded
                     if (ImageUrl is { Length: > 0 })
                     {
-                        // Generate a unique filename for the image
                         var uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(ImageUrl.FileName);
 
-                        // Get the path of the wwwroot/img folder where images will be stored
                         var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "product_images");
 
-                        // Combine the unique filename with the path to store the image
                         var filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
-                        // Copy the uploaded file to the specified path
                         await using (var stream = new FileStream(filePath, FileMode.Create))
                         {
                             await ImageUrl.CopyToAsync(stream);
                         }
 
-                        // Update the ImageUrl property of the product with the new filename
                         product.ImageUrl = uniqueFileName;
                     }
 
-                    // Set CreateDateTime and ModifieDateTime
                     product.CreatedDate = DateTime.Now;
                     product.ModifiedDate = DateTime.Now;
 
-                    // Add the product to the database
                     _context.CSProducts.Add(product);
                     await _context.SaveChangesAsync();
 
+                    TempData["toastMsg"] = "Product Created.";
+
                     TempData["AddSuccess"] = $"Product {product.Id} is added to Menu.";
 
-                    // Redirect to the product list page after successful creation
                     return RedirectToAction("Index");
                 }
                 catch (Exception ex)
                 {
-                    // Log or handle the exception appropriately
                     TempData["AddError"] = $"Exception while adding the new Product : {ex.Message}";
                 }
             }
 
-            // If the model state is not valid, return the view with the model data and errors
             return View(product);
         }
 
-
-        // Action method to display form for updating product details
         public IActionResult Edit(int id)
         {
             TempData["AddSuccess"] = null;
@@ -109,12 +98,12 @@ namespace CyberGuardian360.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(int id, CSProducts product)
+        public async Task<IActionResult> Edit(int id, CSProducts csproducts, IFormFile? newImage)
         {
             TempData["UpdateSuccess"] = null;
             TempData["UpdateError"] = null;
 
-            if (id != product.Id)
+            if (id != csproducts.Id)
             {
                 return NotFound();
             }
@@ -123,31 +112,88 @@ namespace CyberGuardian360.Controllers
             {
                 try
                 {
-                    // Update other properties of the product as usual
-                    _context.Update(product);
+                    var existingProduct = await _context.CSProducts.FindAsync(id);
+
+                    if (existingProduct == null)
+                    {
+                        return NotFound();
+                    }
+
+                    if (newImage != null)
+                    {
+                        if (existingProduct.ImageUrl != null)
+                        {
+                            var imagePath = Path.Combine(_webHostEnvironment.WebRootPath, "product_images", existingProduct.ImageUrl);
+                            if (System.IO.File.Exists(imagePath))
+                            {
+                                System.IO.File.Delete(imagePath);
+                            }
+                        }
+
+                        string uniqueFileName = Guid.NewGuid().ToString() + "_" + newImage.FileName;
+
+                        var newImagePath = Path.Combine(_webHostEnvironment.WebRootPath, "product_images", uniqueFileName);
+                        await using (var stream = new FileStream(newImagePath, FileMode.Create))
+                        {
+                            await newImage.CopyToAsync(stream);
+                        }
+
+                        existingProduct.ImageUrl = uniqueFileName;
+                    }
+
+                    existingProduct.ProductName = csproducts.ProductName;
+                    existingProduct.ProductCost = csproducts.ProductCost;
+                    existingProduct.ProductDescription = csproducts.ProductDescription;
+                    existingProduct.ProductRating = csproducts.ProductRating;
+                    existingProduct.ProductCategoryId = csproducts.ProductCategoryId;
+                    existingProduct.ModifiedDate = DateTime.Now;
+
+                    _context.Update(existingProduct);
                     await _context.SaveChangesAsync();
-                    TempData["UpdateSuccess"] = $"Product {product.Id} is updated successfully.";
+                    TempData["toastMsg"] = "Product Updated.";
                 }
                 catch (Exception ex)
                 {
-                    TempData["UpdateError"] = $"Exception in updating the Product : {ex.Message}.";
+                    TempData["toastMsg"] = $"Exception updating the product : {ex.Message}.";
                 }
             }
             return RedirectToAction("Index");
         }
 
-
-        // Action method to delete a product
         public IActionResult Delete(int id)
         {
-            TempData["AddSuccess"] = null;
-            TempData["AddError"] = null;
-            TempData["UpdateSuccess"] = null;
-            TempData["UpdateError"] = null;
-
             var product = _context.CSProducts.Find(id);
-            if (product != null) _context.CSProducts.Remove(product);
-            _context.SaveChanges();
+            if (product != null)
+            {
+                string filename = product.ImageUrl;
+                _context.CSProducts.Remove(product);
+                _context.SaveChanges();
+                if (filename != null)
+                {
+                    string path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "product_images", filename);
+                    if (System.IO.File.Exists(path))
+                    {
+                        try
+                        {
+                            System.IO.File.Delete(path);
+                        }
+                        catch
+                        {
+                            TempData["toastErrMsg"] = "Product deletion failed from folder.";
+                            return RedirectToAction("Index");
+                        }
+                    }
+                    else
+                    {
+                        TempData["toastErrMsg"] = "Image file not found.";
+                    }
+                }
+                else
+                {
+                    TempData["toastErrMsg"] = "Product not found.";
+                }
+            }
+            TempData["toastMsg"] = "Product Deleted.";
 
             return RedirectToAction("Index");
         }

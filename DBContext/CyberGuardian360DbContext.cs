@@ -21,6 +21,12 @@ namespace CyberGuardian360.DBContext
 
         public virtual DbSet<CSProducts> CSProducts { get; set; } = null!;
 
+        public virtual DbSet<UserCartInfo> CSUserCartInfo { get; set; } = null!;
+
+        public virtual DbSet<UserOrder> CSUserOrders { get; set; } = null!;
+
+        public virtual DbSet<UserOrderItem> CSUserOrderItems { get; set; } = null!;
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);

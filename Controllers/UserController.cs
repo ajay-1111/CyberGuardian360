@@ -3,6 +3,7 @@ using CyberGuardian360.Models;
 using CyberGuardian360.Models.EFDBContext;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace CyberGuardian360.Controllers
 {
@@ -35,9 +36,6 @@ namespace CyberGuardian360.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SignUp(SignUpViewModel model)
         {
-            TempData["SignUpMessage"] = "";
-            TempData["SignUpErrorMessage"] = "";
-
             if (ModelState.IsValid)
             {
                 var errorMessage = string.Empty;
@@ -49,7 +47,6 @@ namespace CyberGuardian360.Controllers
                     Surname = model.Surname,
                     Email = model.Email,
                     Phone = model.Phone,
-                    Password = model.Password,
                 };
 
                 var signup = await userManager.CreateAsync(newUser, model.Password);
@@ -57,7 +54,7 @@ namespace CyberGuardian360.Controllers
                 if (signup.Succeeded)
                 {
                     await signInManager.SignInAsync(newUser, isPersistent: false);
-                    TempData["SignUpMessage"] = "Registration successful!";
+                    TempData["toastMsg"] = "Sign Up Completed.";
                     return RedirectToAction("SignIn", "User");
                 }
                 else
@@ -66,8 +63,7 @@ namespace CyberGuardian360.Controllers
                     {
                         errorMessage += error.Description;
                     }
-
-                    TempData["SignUpErrorMessage"] = errorMessage;
+                    TempData["toastErrMsg"] = errorMessage;
                     return RedirectToAction("SignUp", "User");
                 }
             }
@@ -85,13 +81,37 @@ namespace CyberGuardian360.Controllers
 
                 if (result.Succeeded)
                 {
+                    var user = dbContext.Users.Where(e => e.Email == model.Email).FirstOrDefault();
+
+                    if (user != null)
+                    {
+                        if (user.IsAdmin)
+                        {
+                            HttpContext.Session.SetString("IsAdmin", "1");
+                        }
+                        else
+                        {
+                            HttpContext.Session.SetString("IsAdmin", "0");
+                        }
+                    }
                     return RedirectToAction("Index", "CSProducts");
                 }
-
-                ModelState.AddModelError(string.Empty, "Email or Password is incorrect.");
+                TempData["toastErrMsg"] = "Invalid Credentials.";
             }
 
             return View(model);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> SignOut()
+        {
+            var user = await this.userManager.GetUserAsync(User);
+
+            HttpContext.Session.Clear();
+
+            await this.signInManager.SignOutAsync();
+
+            return RedirectToAction("Index", "Home");
         }
     }
 }
