@@ -13,18 +13,18 @@ namespace CyberGuardian360.Controllers
 
         public AdminController(CyberGuardian360DbContext context, IWebHostEnvironment webHostEnvironment)
         {
-            this._context = context;
-            this._webHostEnvironment = webHostEnvironment;
+            _context = context;
+            _webHostEnvironment = webHostEnvironment;
         }
 
         public IActionResult Index(int page = 1, int pageSize = 10)
         {
-            var products = this._context.CSProducts.OrderBy(p => p.ProductName)
+            var products = _context.CSProducts.OrderBy(p => p.ProductName)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToList();
 
-            var totalProducts = this._context.CSProducts.Count();
+            var totalProducts = _context.CSProducts.Count();
 
             var model = new Pagination<CSProducts>(products, totalProducts, page, pageSize);
 
@@ -33,20 +33,20 @@ namespace CyberGuardian360.Controllers
 
         public IActionResult Create()
         {
-            this.TempData["AddSuccess"] = null;
-            this.TempData["AddError"] = null;
-            this.TempData["UpdateSuccess"] = null;
-            this.TempData["UpdateError"] = null;
-            return this.View();
+            TempData["AddSuccess"] = null;
+            TempData["AddError"] = null;
+            TempData["UpdateSuccess"] = null;
+            TempData["UpdateError"] = null;
+            return View();
         }
 
         [HttpPost]
         public async Task<IActionResult> Create(CSProducts product, IFormFile? ImageUrl)
         {
-            this.TempData["AddSuccess"] = null;
-            this.TempData["AddError"] = null;
+            TempData["AddSuccess"] = null;
+            TempData["AddError"] = null;
 
-            if (this.ModelState.IsValid)
+            if (ModelState.IsValid)
             {
                 try
                 {
@@ -54,7 +54,7 @@ namespace CyberGuardian360.Controllers
                     {
                         var uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(ImageUrl.FileName);
 
-                        var uploadsFolder = Path.Combine(this._webHostEnvironment.WebRootPath, "product_images");
+                        var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "product_images");
 
                         var filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
@@ -69,79 +69,76 @@ namespace CyberGuardian360.Controllers
                     product.CreatedDate = DateTime.Now;
                     product.ModifiedDate = DateTime.Now;
 
-                    this._context.CSProducts.Add(product);
-                    await this._context.SaveChangesAsync();
+                    _context.CSProducts.Add(product);
+                    await _context.SaveChangesAsync();
 
-                    this.TempData["toastMsg"] = "Product Created.";
+                    TempData["toastMsg"] = "Product Created.";
 
-                    this.TempData["AddSuccess"] = $"Product {product.Id} is added to Menu.";
+                    TempData["AddSuccess"] = $"Product {product.Id} is added to Menu.";
 
-                    return this.RedirectToAction("Index");
+                    return RedirectToAction("Index");
                 }
                 catch (Exception ex)
                 {
-                    this.TempData["AddError"] = $"Exception while adding the new Product : {ex.Message}";
+                    TempData["AddError"] = $"Exception while adding the new Product : {ex.Message}";
                 }
             }
 
-            return this.View(product);
+            return View(product);
         }
 
         public IActionResult Edit(int id)
         {
-            this.TempData["AddSuccess"] = null;
-            this.TempData["AddError"] = null;
-            this.TempData["UpdateSuccess"] = null;
-            this.TempData["UpdateError"] = null;
-            var product = this._context.CSProducts.Find(id);
-            return this.View(product);
+            TempData["AddSuccess"] = null;
+            TempData["AddError"] = null;
+            TempData["UpdateSuccess"] = null;
+            TempData["UpdateError"] = null;
+            var product = _context.CSProducts.Find(id);
+            return View(product);
         }
 
         [HttpPost]
         public async Task<IActionResult> Edit(int id, CSProducts product)
         {
-            this.TempData["UpdateSuccess"] = null;
-            this.TempData["UpdateError"] = null;
+            TempData["UpdateSuccess"] = null;
+            TempData["UpdateError"] = null;
 
             if (id != product.Id)
             {
-                return this.NotFound();
+                return NotFound();
             }
 
-            if (this.ModelState.IsValid)
+            if (ModelState.IsValid)
             {
                 try
                 {
-                    this._context.Update(product);
-                    await this._context.SaveChangesAsync();
-                    this.TempData["toastMsg"] = "Product Updated.";
-                    this.TempData["UpdateSuccess"] = $"Product {product.Id} is updated successfully.";
+                    _context.Update(product);
+                    await _context.SaveChangesAsync();
+                    TempData["toastMsg"] = "Product Updated.";
+                    TempData["UpdateSuccess"] = $"Product {product.Id} is updated successfully.";
                 }
                 catch (Exception ex)
                 {
-                    this.TempData["UpdateError"] = $"Exception in updating the Product : {ex.Message}.";
+                    TempData["UpdateError"] = $"Exception in updating the Product : {ex.Message}.";
                 }
             }
-
-            return this.RedirectToAction("Index");
+            return RedirectToAction("Index");
         }
+
 
         public IActionResult Delete(int id)
         {
-            this.TempData["AddSuccess"] = null;
-            this.TempData["AddError"] = null;
-            this.TempData["UpdateSuccess"] = null;
-            this.TempData["UpdateError"] = null;
+            TempData["AddSuccess"] = null;
+            TempData["AddError"] = null;
+            TempData["UpdateSuccess"] = null;
+            TempData["UpdateError"] = null;
 
-            var product = this._context.CSProducts.Find(id);
-            if (product != null)
-            {
-                this._context.CSProducts.Remove(product);
-                this._context.SaveChanges();
-                this.TempData["toastMsg"] = "Product Deleted.";
-            }
+            var product = _context.CSProducts.Find(id);
+            if (product != null) _context.CSProducts.Remove(product);
+            _context.SaveChanges();
+            TempData["toastMsg"] = "Product Deleted.";
 
-            return this.RedirectToAction("Index");
+            return RedirectToAction("Index");
         }
     }
 }

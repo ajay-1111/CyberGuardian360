@@ -76,23 +76,21 @@ else
     <script>
         $(document).ready(function () {
             $('#frmCategories').submit(function (e) {
-                e.preventDefault(); 
-
+                e.preventDefault();
                 var selectedCategories = [];
                 $('input[name="chkCategories"]:checked').each(function () {
                     selectedCategories.push($(this).val());
                 });
-
                 $.ajax({
                     url: '@Url.Action("GetProductsByFilter", "CSProducts")',
                     type: 'GET',
                     data: { chkCategories: selectedCategories },
                     traditional: true,
-                    success: function (result) {                        
-                        $('#productsSection').html(result);
+                    success: function (result) {
+                        // Handle success response
                     },
-                    error: function () {                        
-                        alert('Error occurred while filtering products.');
+                    error: function () {
+                        // Handle error response
                     }
                 });
             });
