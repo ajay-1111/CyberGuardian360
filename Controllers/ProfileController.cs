@@ -70,6 +70,8 @@ namespace CyberGuardian360.Controllers
                         var result = _dbContext.AspNetUsers.Update(userInfo);
                         await _dbContext.SaveChangesAsync();
 
+                        TempData["toastMsg"] = "Profile Updated.";
+
                         return RedirectToAction("Index", "CSProducts");
                     }
                 }

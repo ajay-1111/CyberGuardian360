@@ -50,54 +50,43 @@ namespace CyberGuardian360.Controllers
             {
                 try
                 {
-                    // Check if a file is uploaded
                     if (ImageUrl is { Length: > 0 })
                     {
-                        // Generate a unique filename for the image
                         var uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(ImageUrl.FileName);
 
-                        // Get the path of the wwwroot/img folder where images will be stored
                         var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "product_images");
 
-                        // Combine the unique filename with the path to store the image
                         var filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
-                        // Copy the uploaded file to the specified path
                         await using (var stream = new FileStream(filePath, FileMode.Create))
                         {
                             await ImageUrl.CopyToAsync(stream);
                         }
 
-                        // Update the ImageUrl property of the product with the new filename
                         product.ImageUrl = uniqueFileName;
                     }
 
-                    // Set CreateDateTime and ModifieDateTime
                     product.CreatedDate = DateTime.Now;
                     product.ModifiedDate = DateTime.Now;
 
-                    // Add the product to the database
                     _context.CSProducts.Add(product);
                     await _context.SaveChangesAsync();
 
+                    TempData["toastMsg"] = "Product Created.";
+
                     TempData["AddSuccess"] = $"Product {product.Id} is added to Menu.";
 
-                    // Redirect to the product list page after successful creation
                     return RedirectToAction("Index");
                 }
                 catch (Exception ex)
                 {
-                    // Log or handle the exception appropriately
                     TempData["AddError"] = $"Exception while adding the new Product : {ex.Message}";
                 }
             }
 
-            // If the model state is not valid, return the view with the model data and errors
             return View(product);
         }
 
-
-        // Action method to display form for updating product details
         public IActionResult Edit(int id)
         {
             TempData["AddSuccess"] = null;
@@ -123,9 +112,9 @@ namespace CyberGuardian360.Controllers
             {
                 try
                 {
-                    // Update other properties of the product as usual
                     _context.Update(product);
                     await _context.SaveChangesAsync();
+                    TempData["toastMsg"] = "Product Updated.";
                     TempData["UpdateSuccess"] = $"Product {product.Id} is updated successfully.";
                 }
                 catch (Exception ex)
@@ -137,7 +126,6 @@ namespace CyberGuardian360.Controllers
         }
 
 
-        // Action method to delete a product
         public IActionResult Delete(int id)
         {
             TempData["AddSuccess"] = null;
@@ -148,6 +136,7 @@ namespace CyberGuardian360.Controllers
             var product = _context.CSProducts.Find(id);
             if (product != null) _context.CSProducts.Remove(product);
             _context.SaveChanges();
+            TempData["toastMsg"] = "Product Deleted.";
 
             return RedirectToAction("Index");
         }

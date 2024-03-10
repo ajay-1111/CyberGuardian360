@@ -91,5 +91,29 @@ body {
 }
 
 .paddingtop3rem {
-    padding-top:3rem;
+    padding-top: 3rem;
+}
+
+.w100 {
+    width: 100% !important;
+}
+
+.w20 {
+    width: 20% !important;
+}
+
+.w80 {
+    width: 80% !important;
+}
+
+.t-center {
+    text-align: center !important;
+}
+
+.border1 {
+    border: 1px solid black !important;
+}
+
+.valign-top {
+    vertical-align: top;
 }

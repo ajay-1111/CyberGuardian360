@@ -61,7 +61,7 @@ namespace CyberGuardian360.Controllers
                         // Remove the cart items associated with this user
                         _context.CSUserCartInfo.RemoveRange(cartItems);
                         await _context.SaveChangesAsync();
-
+                        TempData["toastMsg"] = "Purchase Completed.";
                         return Json(new { success = true, message = "Purchase Completed." });
                     }
 

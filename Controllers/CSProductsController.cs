@@ -19,21 +19,17 @@ namespace CyberGuardian360.Controllers
         public IActionResult Index()
         {
             TempData["NoProducts"] = null;
-            // Retrieve all products from the database
             var products = _context.CSProducts.ToList();
 
-            // Check if products list is empty
             if (products.Count == 0)
             {
-                // If products list is empty, set an error message using ViewBag
                 TempData["NoProducts"] = "Currently no products available.";
                 return View();
             }
 
-            // Create a list to hold the view models for all products
+            Filter filter = new Filter();
             List<CSProductsViewModel> productViewModels = new List<CSProductsViewModel>();
 
-            // Loop through each product and create a view model for it
             foreach (var product in products)
             {
                 CSProductsViewModel productsModel = new CSProductsViewModel()
@@ -46,55 +42,83 @@ namespace CyberGuardian360.Controllers
                     Id = product.Id,
                 };
 
-                // Add the view model to the list
                 productViewModels.Add(productsModel);
             }
+            filter.CSProductsViewModel = productViewModels;
+            var list = new List<CheckboxModel>
+            {
+                new CheckboxModel{Id = 1, Name = "Anti Virus Software", Checked = false},
+                new CheckboxModel{Id = 2, Name = "Firewall Solutions", Checked = false},
+                new CheckboxModel{Id = 3, Name = "Data Encryption Tools", Checked = false}
+            };
+            filter.CheckBoxes = list;
 
-            // Pass the list of view models to the view
-            return View(productViewModels);
+            return View(filter);
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetProductsByCategory(string category)
+        public async Task<IActionResult> GetProductsByFilter(int[] chkCategories)
         {
-            if (!string.IsNullOrWhiteSpace(category))
-            {
-                var categoryEnum = (CSProducts.CSCategories)Enum.Parse(typeof(CSProducts.CSCategories), category, true);
 
-                var products = await _context.CSProducts
-                    .Where(p => p.ProductCategoryId == categoryEnum)
-                    .ToListAsync();
+            //List<CheckboxModel> filter
+            //if (filter.Where(a => a.Checked).Count() > 0)
+            //{
+            //    var categories = filter.Where(a => a.Checked).Select(b => b.Id).ToList();
+            //    var products = await _context.CSProducts
+            //        .Where(s => categories.Contains((int)s.ProductCategoryId))
+            //        .ToListAsync();
 
-                if (products.Count == 0)
-                {
-                    TempData["NoProducts"] = $"No products available for category: {category}";
-                    return RedirectToAction("Index");
-                }
+            //    if (products.Count == 0)
+            //    {
+            //        TempData["NoProducts"] = $"No products available for category.";
+            //        return RedirectToAction("Index");
+            //    }
 
-                var productviewmodels = products.Select(product => new CSProductsViewModel
-                {
-                    ImageUrl = product.ImageUrl,
-                    ProductName = product.ProductName,
-                    ProductCost = product.ProductCost,
-                    ProductRating = product.ProductRating,
-                    Id = product.Id
-                }).ToList();
+            //    var productviewmodels = products.Select(product => new CSProductsViewModel
+            //    {
+            //        ImageUrl = product.ImageUrl,
+            //        ProductName = product.ProductName,
+            //        ProductCost = product.ProductCost,
+            //        ProductRating = product.ProductRating,
+            //        Id = product.Id
+            //    }).ToList();
 
-                return View("Index", productviewmodels);
-            }
+            //    return View("Index", productviewmodels);
+            //}
 
             return RedirectToAction("Index");
         }
 
-        [HttpGet]
-        public async Task<IActionResult> Search(string query)
-        {
-            var results = await _context.CSProducts
-                .Where(p => p.ProductName.Contains(query))
-                .Select(p => new { p.ProductName })
-                .ToListAsync();
+        //[HttpGet]
+        //public async Task<IActionResult> GetProductsByCategory(string category)
+        //{
+        //    if (!string.IsNullOrWhiteSpace(category))
+        //    {
+        //        var categoryEnum = (CSProducts.CSCategories)Enum.Parse(typeof(CSProducts.CSCategories), category, true);
 
-            return Json(results);
-        }
+        //        var products = await _context.CSProducts
+        //            .Where(p => p.ProductCategoryId == categoryEnum)
+        //            .ToListAsync();
+
+        //        if (products.Count == 0)
+        //        {
+        //            TempData["NoProducts"] = $"No products available for category: {category}";
+        //            return RedirectToAction("Index");
+        //        }
+
+        //        var productviewmodels = products.Select(product => new CSProductsViewModel
+        //        {
+        //            ImageUrl = product.ImageUrl,
+        //            ProductName = product.ProductName,
+        //            ProductCost = product.ProductCost,
+        //            ProductRating = product.ProductRating,
+        //            Id = product.Id
+        //        }).ToList();
+
+        //        return View("Index", productviewmodels);
+        //    }
+
+        //    return RedirectToAction("Index");
+        //}
     }
 }

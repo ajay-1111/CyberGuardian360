@@ -66,10 +66,24 @@
             </div>
         </nav>
     </header>
-    <div class="container">
-        <main role="main" class="pb-3">
+    <div class="container w-100">
+        <main role="main" class="pb-3 w-100">
             @RenderBody()
         </main>
+        @if (TempData["toastMsg"] != null)
+        {
+            <div class="toast-container" style="position: absolute; top: 55px; right: 10px;">
+                <div class="toast bg-success text-white fade show">
+                    <div class="toast-header bg-success text-white">
+                        <strong class="me-auto">Status</strong>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+                    </div>
+                    <div class="toast-body">
+                        @TempData["toastMsg"]
+                    </div>
+                </div>
+            </div>
+        }
     </div>
 
     <footer class="border-top footer bluewhitecolor">
@@ -77,10 +91,14 @@
             &copy; 2024 - CyberGuardian360
         </div>
     </footer>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="~/js/disableBackButton.js" asp-append-version="true"></script>
+    <script>
+        $('.toast').show();
+    </script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
