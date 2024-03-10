@@ -98,12 +98,12 @@ namespace CyberGuardian360.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(int id, CSProducts product)
+        public async Task<IActionResult> Edit(int id, CSProducts csproducts, IFormFile? newImage)
         {
             TempData["UpdateSuccess"] = null;
             TempData["UpdateError"] = null;
 
-            if (id != product.Id)
+            if (id != csproducts.Id)
             {
                 return NotFound();
             }
@@ -112,30 +112,87 @@ namespace CyberGuardian360.Controllers
             {
                 try
                 {
-                    _context.Update(product);
+                    var existingProduct = await _context.CSProducts.FindAsync(id);
+
+                    if (existingProduct == null)
+                    {
+                        return NotFound();
+                    }
+
+                    if (newImage != null)
+                    {
+                        if (existingProduct.ImageUrl != null)
+                        {
+                            var imagePath = Path.Combine(_webHostEnvironment.WebRootPath, "product_images", existingProduct.ImageUrl);
+                            if (System.IO.File.Exists(imagePath))
+                            {
+                                System.IO.File.Delete(imagePath);
+                            }
+                        }
+
+                        string uniqueFileName = Guid.NewGuid().ToString() + "_" + newImage.FileName;
+
+                        var newImagePath = Path.Combine(_webHostEnvironment.WebRootPath, "product_images", uniqueFileName);
+                        await using (var stream = new FileStream(newImagePath, FileMode.Create))
+                        {
+                            await newImage.CopyToAsync(stream);
+                        }
+
+                        existingProduct.ImageUrl = uniqueFileName;
+                    }
+
+                    existingProduct.ProductName = csproducts.ProductName;
+                    existingProduct.ProductCost = csproducts.ProductCost;
+                    existingProduct.ProductDescription = csproducts.ProductDescription;
+                    existingProduct.ProductRating = csproducts.ProductRating;
+                    existingProduct.ProductCategoryId = csproducts.ProductCategoryId;
+                    existingProduct.ModifiedDate = DateTime.Now;
+
+                    _context.Update(existingProduct);
                     await _context.SaveChangesAsync();
                     TempData["toastMsg"] = "Product Updated.";
-                    TempData["UpdateSuccess"] = $"Product {product.Id} is updated successfully.";
                 }
                 catch (Exception ex)
                 {
-                    TempData["UpdateError"] = $"Exception in updating the Product : {ex.Message}.";
+                    TempData["toastMsg"] = $"Exception updating the product : {ex.Message}.";
                 }
             }
             return RedirectToAction("Index");
         }
 
-
         public IActionResult Delete(int id)
         {
-            TempData["AddSuccess"] = null;
-            TempData["AddError"] = null;
-            TempData["UpdateSuccess"] = null;
-            TempData["UpdateError"] = null;
-
             var product = _context.CSProducts.Find(id);
-            if (product != null) _context.CSProducts.Remove(product);
-            _context.SaveChanges();
+            if (product != null)
+            {
+                string filename = product.ImageUrl;
+                _context.CSProducts.Remove(product);
+                _context.SaveChanges();
+                if (filename != null)
+                {
+                    string path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "product_images", filename);
+                    if (System.IO.File.Exists(path))
+                    {
+                        try
+                        {
+                            System.IO.File.Delete(path);
+                        }
+                        catch
+                        {
+                            TempData["toastErrMsg"] = "Product deletion failed from folder.";
+                            return RedirectToAction("Index");
+                        }
+                    }
+                    else
+                    {
+                        TempData["toastErrMsg"] = "Image file not found.";
+                    }
+                }
+                else
+                {
+                    TempData["toastErrMsg"] = "Product not found.";
+                }
+            }
             TempData["toastMsg"] = "Product Deleted.";
 
             return RedirectToAction("Index");

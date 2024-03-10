@@ -27,7 +27,7 @@
                 <div class="form-group col-md-3">
                     <span class="colorred"><b>*</b></span>
                     <label asp-for="ProductRating"></label>
-                    <input asp-for="ProductRating" class="form-control" required />
+                    <input asp-for="ProductRating" class="form-control" type="number" required min="1" max="5" pattern="[1-5]"/>
                     <span asp-validation-for="ProductRating" class="text-danger"></span>
                 </div>
                 <div class="form-group col-md-3">

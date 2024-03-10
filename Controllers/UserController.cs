@@ -36,9 +36,6 @@ namespace CyberGuardian360.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SignUp(SignUpViewModel model)
         {
-            TempData["SignUpMessage"] = "";
-            TempData["SignUpErrorMessage"] = "";
-
             if (ModelState.IsValid)
             {
                 var errorMessage = string.Empty;
@@ -57,7 +54,7 @@ namespace CyberGuardian360.Controllers
                 if (signup.Succeeded)
                 {
                     await signInManager.SignInAsync(newUser, isPersistent: false);
-                    TempData["SignUpMessage"] = "Registration successful!";
+                    TempData["toastMsg"] = "Sign Up Completed.";
                     return RedirectToAction("SignIn", "User");
                 }
                 else
@@ -66,8 +63,7 @@ namespace CyberGuardian360.Controllers
                     {
                         errorMessage += error.Description;
                     }
-
-                    TempData["SignUpErrorMessage"] = errorMessage;
+                    TempData["toastErrMsg"] = errorMessage;
                     return RedirectToAction("SignUp", "User");
                 }
             }
@@ -91,19 +87,16 @@ namespace CyberGuardian360.Controllers
                     {
                         if (user.IsAdmin)
                         {
-                            //TempData["IsAdmin"] = true;
                             HttpContext.Session.SetString("IsAdmin", "1");
                         }
                         else
                         {
                             HttpContext.Session.SetString("IsAdmin", "0");
-                            //TempData["IsAdmin"] = false;
                         }
                     }
                     return RedirectToAction("Index", "CSProducts");
                 }
-                TempData["LoginError"] = "Incorrect username/password. Register here if you are new.";
-
+                TempData["toastErrMsg"] = "Invalid Credentials.";
             }
 
             return View(model);
@@ -117,21 +110,6 @@ namespace CyberGuardian360.Controllers
             HttpContext.Session.Clear();
 
             await this.signInManager.SignOutAsync();
-
-            
-
-            //if (user != null)
-            //{
-            //    var cartItems = await this.dbContext.CSUserCartInfo
-            //        .Where(u => u.UserId == user.Id)
-            //        .ToListAsync();
-
-            //    if (cartItems.Any())
-            //    {
-            //        this.dbContext.CSUserCartInfo.RemoveRange(cartItems);
-            //        await this.dbContext.SaveChangesAsync();
-            //    }
-            //}
 
             return RedirectToAction("Index", "Home");
         }

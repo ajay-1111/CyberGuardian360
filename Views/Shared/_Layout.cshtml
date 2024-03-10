@@ -84,6 +84,20 @@
                 </div>
             </div>
         }
+        @if (TempData["toastErrMsg"] != null)
+        {
+            <div class="toast-container" style="position: absolute; top: 55px; right: 10px;">
+                <div class="toast bg-danger text-white fade show">
+                    <div class="toast-header bg-danger text-white">
+                        <strong class="me-auto">Status</strong>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+                    </div>
+                    <div class="toast-body">
+                        @TempData["toastErrMsg"]
+                    </div>
+                </div>
+            </div>
+        }
     </div>
 
     <footer class="border-top footer bluewhitecolor">

@@ -28,7 +28,7 @@
                 <div class="form-group col-md-3">
                     <span class="colorred"><b>*</b></span>
                     <label asp-for="ProductRating"></label>
-                    <input asp-for="ProductRating" class="form-control" required />
+                    <input asp-for="ProductRating" class="form-control" type="number" required min="1" max="5" pattern="[1-5]" />
                     <span asp-validation-for="ProductRating" class="text-danger"></span>
                 </div>
                 <div class="form-group col-md-3">
@@ -41,12 +41,16 @@
                     </select>
                     <span asp-validation-for="ProductCategoryId" class="text-danger"></span>
                 </div>
+                <div class="form-group col-md-12">
+                    <label><b>Previous File:</b></label>&emsp;@Model.ImageUrl
+                </div>
                 <div class="form-group col-md-3">
                     <span class="colorred"><b>*</b></span>
-                    <label asp-for="ImageUrl"></label>
-                    <input asp-for="ImageUrl" class="form-control" type="file" value="@Model.ImageUrl" disabled />
+                    <label>Current File</label>
+                    <input asp-for="ImageUrl" class="form-control" type="file" value="@Model.ImageUrl" name="newImage" accept="image/*" />
                     <span asp-validation-for="ImageUrl" class="text-danger"></span>
                 </div>
+
                 <div class="form-group col-md-9">
                     <label asp-for="ProductDescription"></label>
                     <input asp-for="ProductDescription" class="form-control" />
