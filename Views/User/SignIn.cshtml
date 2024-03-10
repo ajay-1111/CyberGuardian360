@@ -2,6 +2,7 @@
 @{
     ViewData["Title"] = "SignIn";
 }
+
 <form asp-controller="User" asp-action="SignIn" method="post">
     <section>
         <div class="container">
@@ -53,7 +54,7 @@
         var customeMessage = '@(TempData["LoginError"] as string)';
 
         if (customeMessage) {
-            Swal.fire()
+            Swal.fire(
                 'Cyber Guardian 360',
                 customeMessage,
                 'error').then(function () {

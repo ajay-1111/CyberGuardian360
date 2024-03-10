@@ -1,7 +1,5 @@
 ﻿using CyberGuardian360.DBContext;
-using CyberGuardian360.Migrations;
 using CyberGuardian360.Models;
-using CyberGuardian360.Models.EFDBContext;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,21 +8,22 @@ namespace CyberGuardian360.Controllers
     public class CSProductsController : Controller
     {
         private readonly CyberGuardian360DbContext _context;
+
         public CSProductsController(CyberGuardian360DbContext context)
         {
-            _context = context;
+            this._context = context;
         }
 
         [HttpGet]
         public IActionResult Index()
         {
-            TempData["NoProducts"] = null;
-            var products = _context.CSProducts.ToList();
+            this.TempData["NoProducts"] = null;
+            var products = this._context.CSProducts.ToList();
 
             if (products.Count == 0)
             {
-                TempData["NoProducts"] = "Currently no products available.";
-                return View();
+                this.TempData["NoProducts"] = "Currently no products available.";
+                return this.View();
             }
 
             Filter filter = new Filter();
@@ -44,49 +43,54 @@ namespace CyberGuardian360.Controllers
 
                 productViewModels.Add(productsModel);
             }
+
             filter.CSProductsViewModel = productViewModels;
+
             var list = new List<CheckboxModel>
             {
-                new CheckboxModel{Id = 1, Name = "Anti Virus Software", Checked = false},
-                new CheckboxModel{Id = 2, Name = "Firewall Solutions", Checked = false},
-                new CheckboxModel{Id = 3, Name = "Data Encryption Tools", Checked = false}
+                new CheckboxModel{ Id = 1, Name = "Anti Virus Software", Checked = false },
+                new CheckboxModel{ Id = 2, Name = "Firewall Solutions", Checked = false },
+                new CheckboxModel{ Id = 3, Name = "Data Encryption Tools", Checked = false },
             };
+
             filter.CheckBoxes = list;
 
-            return View(filter);
+            return this.View(filter);
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetProductsByFilter(int[] chkCategories)
+        public async Task<IActionResult> GetProductsByFilter(int[]? chkCategories)
         {
+            if (chkCategories == null || chkCategories.Length == 0)
+            {
+                return this.RedirectToAction("Index");
+            }
 
-            //List<CheckboxModel> filter
-            //if (filter.Where(a => a.Checked).Count() > 0)
-            //{
-            //    var categories = filter.Where(a => a.Checked).Select(b => b.Id).ToList();
-            //    var products = await _context.CSProducts
-            //        .Where(s => categories.Contains((int)s.ProductCategoryId))
-            //        .ToListAsync();
+            var products = await this._context.CSProducts
+                .Where(p => chkCategories.Contains((int)p.ProductCategoryId))
+                .ToListAsync();
 
-            //    if (products.Count == 0)
-            //    {
-            //        TempData["NoProducts"] = $"No products available for category.";
-            //        return RedirectToAction("Index");
-            //    }
+            if (products.Count == 0)
+            {
+                this.TempData["NoProducts"] = "No products available for selected categories.";
+                return this.RedirectToAction("Index");
+            }
 
-            //    var productviewmodels = products.Select(product => new CSProductsViewModel
-            //    {
-            //        ImageUrl = product.ImageUrl,
-            //        ProductName = product.ProductName,
-            //        ProductCost = product.ProductCost,
-            //        ProductRating = product.ProductRating,
-            //        Id = product.Id
-            //    }).ToList();
+            var productViewModels = products.Select(product => new CSProductsViewModel
+            {
+                ImageUrl = product.ImageUrl,
+                ProductName = product.ProductName,
+                ProductCost = product.ProductCost,
+                ProductRating = product.ProductRating,
+                Id = product.Id,
+            }).ToList();
 
-            //    return View("Index", productviewmodels);
-            //}
+            var filter = new Filter
+            {
+                CSProductsViewModel = productViewModels,
+            };
 
-            return RedirectToAction("Index");
+            return this.View("Index", filter);
         }
 
         //[HttpGet]
