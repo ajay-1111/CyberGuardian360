@@ -1,0 +1,40 @@
+﻿@model CyberGuardian360.Models.Filter
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<CyberGuardian360.Models.EFDBContext.UserRegistration> SignInManager
+
+@if (SignInManager.IsSignedIn(User))
+{
+    <div id="productListContainer">
+        @await Html.PartialAsync("ProductListPartialView", Model)
+    </div>
+}
+else
+{
+    <div class="row g-3 col-form-label-lg paddingtop3rem">You are logged out. Please sign In.</div>
+}
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#frmCategories').submit(function (e) {
+                e.preventDefault();
+                var selectedCategories = [];
+                $('input[name="chkCategories"]:checked').each(function () {
+                    selectedCategories.push($(this).val());
+                });
+                $.ajax({
+                    url: '@Url.Action("GetProductsByFilter", "CSProducts")',
+                    type: 'GET',
+                    data: { 'chkCategories': selectedCategories },
+                    traditional: true,
+                    success: function (result) {
+                        $('#productListContainer').html(result);
+                    },
+                    error: function () {
+                        alert('Error occurred while applying filter.');
+                    }
+                });
+            });
+        });
+    </script>
+}

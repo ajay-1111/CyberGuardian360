@@ -1,0 +1,77 @@
+﻿@model CyberGuardian360.Models.Filter
+
+@{
+    ViewData["Title"] = "CS Products";
+    // Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@if (Model != null)
+{
+    <table class="w100">
+        <tr>
+            <td class="w20 valign-top">
+                <div>
+                    <p class="t-center"><b>Apply Filters</b></p>
+                    <hr>
+                    <p><b>Category:</b></p>
+                    <form id="frmCategories">
+                        @foreach (var checkbox in Model.CheckBoxes)
+                        {
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="@checkbox.Id" value="@checkbox.Id" name="chkCategories">
+                                <label class="form-check-label" for="@checkbox.Id">@checkbox.Name</label>
+                            </div>
+                        }
+                        <hr>
+                        <div class="d-flex justify-content-center mx-4 mb-3 mb-lg-4">
+                            <button type="submit" class="btn btn-sm cust_btn" id="btnfilter">Apply Filter</button>
+                        </div>
+                    </form>
+                </div>
+            </td>
+            <td class="w80">
+                <div class="container">
+                    <p class="t-center" style="font-size:20px"><b>Products</b></p>
+                    <div class="row mt-5 mb-3">
+                        @if (Model.CSProductsViewModel is { Count: > 0 })
+                        {
+                            @foreach (var product in Model.CSProductsViewModel)
+                            {
+                                <div class="col-sm-12 mb-4">
+                                    <div class="card">
+                                        <table border="0">
+                                            <tr>
+                                                <td style="width:15%">
+                                                    <img src="product_images/@product.ImageUrl" class="card-img-top" alt="Product Image" style="height:150px;width:150px">
+                                                </td>
+                                                <td style="width:65%">
+                                                    <div class="card-body">
+                                                        <h5 class="card-title">@product.ProductName</h5>
+                                                        <p class="card-text">Price: £@product.ProductCost</p>
+                                                        <p class="card-text">Rating: @product.ProductRating</p>
+                                                        <p class="card-text">Description: @product.ProductDescription</p>
+                                                    </div>
+                                                </td>
+                                                <td style="width:25%; text-align:right; padding-right:1rem;">
+                                                    <a asp-controller="Cart" asp-action="AddToCart" asp-route-id="@product.Id" class="btn btn-primary cust_btn">Add to Cart</a>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div>No products available.</div>
+                        }
+                    </div>
+                </div>
+            </td>
+        </tr>
+    </table>
+}
+else
+{
+    <div class="row g-3 col-form-label-lg paddingtop3rem">No products available. Please contact admin.</div>
+}

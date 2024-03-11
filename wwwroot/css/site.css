@@ -1,18 +1,119 @@
 html {
-  font-size: 14px;
+    font-size: 14px;
 }
 
 @media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
+    html {
+        font-size: 16px;
+    }
 }
 
 html {
-  position: relative;
-  min-height: 100%;
+    position: relative;
+    min-height: 100%;
 }
 
 body {
-  margin-bottom: 60px;
+    margin-bottom: 60px;
+}
+
+.logo img {
+    width: 15rem;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    height: 2.5rem;
+    background: #FFFFFF;
+}
+
+.footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    white-space: nowrap;
+    line-height: 45px;
+}
+
+.bluewhitecolor {
+    background-color: #012169;
+    color: #FFFFFF;
+}
+
+.bgcolorgrey {
+    background-color: #F5F5F5 !important;
+}
+
+.paddingright20px {
+    padding-right: 20px;
+}
+
+.cust_btn {
+    background-color: #012169;
+    color: #FFFFFF;
+    padding-top: 0.3rem;
+    padding-bottom: 0.3rem;
+}
+
+.validationText {
+    font-family: Arial, Helvetica, sans-serif;
+    font-style: italic;
+    font-size: 12px;
+    font-weight: bold;
+    float: right;
+}
+
+.cust_pg_body {
+    background-color: #F5F5F5;
+    padding-bottom: 1rem;
+}
+
+.colorred {
+    color: red;
+}
+
+.form-control-ddl {
+    display: block;
+    width: 100%;
+    padding: 0.375rem 0.75rem;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #212529;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid #ced4da;
+    -webkit-appearance: caret;
+    -moz-appearance: none;
+    border-radius: 0.25rem;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.paddingtop3rem {
+    padding-top: 3rem;
+}
+
+.w100 {
+    width: 100% !important;
+}
+
+.w20 {
+    width: 20% !important;
+}
+
+.w80 {
+    width: 80% !important;
+}
+
+.t-center {
+    text-align: center !important;
+}
+
+.border1 {
+    border: 1px solid black !important;
+}
+
+.valign-top {
+    vertical-align: top;
 }
