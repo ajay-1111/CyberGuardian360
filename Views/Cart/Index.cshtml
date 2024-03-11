@@ -29,7 +29,7 @@
                                         <td>
                                             <div class="input-group">
                                                 <button class="btn btn-outline-secondary minusBtn" data-product-id="@item.ProductId">-</button>
-                                                <input type="text" class="form-control quantity-input" value="@item.Quantity" id="quantity-@item.ProductId" readonly />
+                                                <input type="text" class="form-control quantity-input productcount" value="@item.Quantity" id="quantity-@item.ProductId" readonly />
                                                 <button class="btn btn-outline-secondary plusBtn" data-product-id="@item.ProductId">+</button>
                                             </div>
                                         </td>
@@ -66,6 +66,10 @@
     <script>
         $(document).ready(function () {
             $(document).on('click', '.plusBtn', function () {
+                var currentvalue = document.getElementById('basketcount').innerText
+
+                document.getElementById('basketcount').innerText = parseInt(currentvalue) + 1;
+
                 var productId = $(this).data('product-id');
                 var quantityInput = $('#quantity-' + productId);
                 var quantity = parseInt(quantityInput.val());
@@ -85,6 +89,11 @@
             });
 
             $(document).on('click', '.minusBtn', function () {
+
+                var currentvalue = document.getElementById('basketcount').innerText
+
+                document.getElementById('basketcount').innerText = parseInt(currentvalue) - 1;
+
                 var productId = $(this).data('product-id');
                 var quantityInput = $('#quantity-' + productId);
                 var quantity = parseInt(quantityInput.val());
@@ -106,6 +115,7 @@
             });
 
             $(document).on('click', '.removeBtn', function () {
+               
                 var productId = $(this).data('product-id');
                 var row = $(this).closest('tr');
                 $.ajax({
@@ -124,6 +134,10 @@
                         console.error('Error:', err);
                     }
                 });
+
+                var romoveProdCount = document.getElementById('quantity-' + productId).value;
+
+                document.getElementById('basketcount').innerText = parseInt(document.getElementById('basketcount').innerText) - parseInt(romoveProdCount);
             });
 
             $(document).on('click', '.checkOutBtn', function () {
