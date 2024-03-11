@@ -100,7 +100,7 @@ namespace CyberGuardian360.Controllers
                 }
                 filter.CheckBoxes = list;
 
-                return View("Index", filter);
+                return PartialView("ProductListPartialView", filter);
             }
 
             return RedirectToAction("Index");
