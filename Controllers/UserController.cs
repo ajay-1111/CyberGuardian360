@@ -81,19 +81,19 @@ namespace CyberGuardian360.Controllers
 
                 if (result.Succeeded)
                 {
-                    var user = dbContext.Users.Where(e => e.Email == model.Email).FirstOrDefault();
+                    //var user = dbContext.Users.Where(e => e.Email == model.Email).FirstOrDefault();
 
-                    if (user != null)
-                    {
-                        if (user.IsAdmin)
-                        {
-                            HttpContext.Session.SetString("IsAdmin", "1");
-                        }
-                        else
-                        {
-                            HttpContext.Session.SetString("IsAdmin", "0");
-                        }
-                    }
+                    //if (user != null)
+                    //{
+                    //    if (user.IsAdmin)
+                    //    {
+                    //        HttpContext.Session.SetString("IsAdmin", "1");
+                    //    }
+                    //    else
+                    //    {
+                    //        HttpContext.Session.SetString("IsAdmin", "0");
+                    //    }
+                    //}
                     return RedirectToAction("Index", "CSProducts");
                 }
                 TempData["toastErrMsg"] = "Invalid Credentials.";

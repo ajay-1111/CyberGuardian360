@@ -91,7 +91,7 @@ namespace CyberGuardian360.Controllers
             // Set the cart item count in TempData
             int cartItemCount = await GetCartItemCount();
             //TempData["CartItemCount"] = cartItemCount;
-            HttpContext.Session.SetString("CartItemCount", cartItemCount.ToString());
+           // HttpContext.Session.SetString("CartItemCount", cartItemCount.ToString());
 
 
             return RedirectToAction("Index", "CSProducts");
@@ -152,7 +152,7 @@ namespace CyberGuardian360.Controllers
             // Set the cart item count in TempData
             int cartItemCount = await GetCartItemCount();
             //TempData["CartItemCount"] = cartItemCount;
-            HttpContext.Session.SetString("CartItemCount", cartItemCount.ToString());
+           // HttpContext.Session.SetString("CartItemCount", cartItemCount.ToString());
 
             return RedirectToAction("Index", "Cart");
         }
@@ -212,7 +212,7 @@ namespace CyberGuardian360.Controllers
             // Set the cart item count in TempData
             int cartItemCount = await GetCartItemCount();
             //TempData["CartItemCount"] = cartItemCount;
-            HttpContext.Session.SetString("CartItemCount", cartItemCount.ToString());
+            //HttpContext.Session.SetString("CartItemCount", cartItemCount.ToString());
 
             return RedirectToAction("Index", "Cart");
         }
